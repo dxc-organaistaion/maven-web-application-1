@@ -1,0 +1,24 @@
+node{
+   stage('SCM Checkout'){    
+       git credentialsId: 'git-creds', url: 'https://github.com/dxc-organaistaion/maven-web-application-1.git'  
+   }
+   stage('Mvn Package'){   
+     def mvnHome = tool name: 'maven-3', type: 'maven'
+     def mvnCMD = "${mvnHome}/bin/mvn"
+     sh "${mvnCMD} clean package"
+   }
+   stage('Build Docker Image'){
+       sh 'docker build -t suresha10/maven-web-application:2.0.0 .'
+   }
+   stage('Push Docker Image'){
+   withCredentials([string(credentialsId: 'dockerHubPwd', variable: 'dockerHubPwd')]) {
+        sh "docker login -u suresha10 -p ${dockerHubPwd}"
+   }
+sh 'docker push suresha10/maven-web-application:2.0.0'
+}
+   stage('deploy k8s pods'){
+      sh 'cp /root/.jenkins/workspace/maven-web-application/deployment.yaml  /root/deployment.yaml'
+      sh 'cd /root'
+      sh 'kubectl apply -f spring-deployment.yaml'
+   }
+}
