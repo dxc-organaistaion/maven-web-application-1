@@ -17,8 +17,8 @@ node{
 sh 'docker push suresha10/maven-web-application:2.0.0'
 }
    stage('deploy k8s pods'){
-      sh 'cp /root/.jenkins/workspace/maven-web-application/deployment.yaml  /root/deployment.yaml'
+      sh 'cp /root/.jenkins/workspace/maven-web-application/mavenwebappdeployment.yaml  /root/mavenwebappdeployment.yaml'
       sh 'cd /root'
-      sh 'kubectl apply -f spring-deployment.yaml'
+      sh 'kubectl apply -f mavenwebappdeployment.yaml'
    }
 }
